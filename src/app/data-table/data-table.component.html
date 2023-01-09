@@ -1,0 +1,70 @@
+<div class="datatable-wrapper">
+  <table [cellSpacing]="0">
+    <thead>
+      <tr>
+        <ng-container *ngIf="hasCheck">
+          <th class="checkColumn">
+            <label class="checkbox path">
+              <input class="tableCheck" (change)="checkAll($event)" type="checkbox">
+              <svg viewBox="0 0 21 21">
+                  <path d="M5,10.75 L8.5,14.25 L19.4,2.3 C18.8333333,1.43333333 18.0333333,1 17,1 L4,1 C2.35,1 1,2.35 1,4 L1,17 C1,18.65 2.35,20 4,20 L17,20 C18.65,20 20,18.65 20,17 L20,7.99769186"></path>
+              </svg>
+          </label>
+          </th>
+        </ng-container>
+
+        <th *ngFor="let c of columns" [ngClass]="{'clickable': c.sortable}" (click)="sortData($event,c)">{{c.name}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr tabindex="0" *ngFor="let d of showData" [ngClass]="{'clickable': expandable}" (click)="expand(expandable ? d.id : 0)">
+        <td class="checkColumn" *ngIf="hasCheck">
+          <label class="checkbox bounce">
+            <input [checked]="allChecked || isCheck(d.id)" class="rowCheck" (change)="checkOne($event, d)" type="checkbox">
+            <svg viewBox="0 0 21 21">
+                <polyline points="5 10.75 8.5 14.25 16 6"></polyline>
+            </svg>
+        </label>
+        </td>
+        <ng-container *ngFor="let c of columns">
+          <td *ngIf="c.type === 'string'">
+            {{d[c.property]}}
+          </td>
+          <td *ngIf="c.type === 'boolean'">
+            <span *ngIf="d[c.property]" class="text-success">Oui</span>
+            <span *ngIf="!d[c.property]" class="text-danger">Non</span>
+          </td>
+          <td *ngIf="c.type === 'avatar'">
+            <img class="img-avatar" src="/assets/{{d[c.property]}}" alt="{{d[c.property]}}">
+          </td>
+          <td *ngIf="c.type === 'date'">
+            {{d[c.property] | date : "dd/MM/yyyy"}}
+          </td>
+        </ng-container>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-container *ngIf="totalItems > 0">
+    <div class="paginator-wrapper">
+      <ul class="page">
+        <li (click)="changePage(currentPage-1)" *ngIf="currentPage > 1" class="page__btn"><mat-icon>chevron_left</mat-icon></li>
+        <li class="page__numbers" *ngFor="let i of pagesArray" [ngClass]="{'active': currentPage === i}" (click)="changePage(i)">{{i}}</li>
+        <ng-container *ngIf="nbPages > maxPageDisplay && currentPage + 1 < nbPages">
+          <li class="page__dots">...</li>
+          <li (click)="changePage(nbPages)" [ngClass]="{'active': currentPage === nbPages}" class="page__numbers">{{nbPages}}</li>
+        </ng-container>
+        <li (click)="changePage(currentPage+1)" *ngIf="currentPage < nbPages" class="page__btn"><mat-icon>chevron_right</mat-icon></li>
+      </ul>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="totalItems === 0">
+    <p style="text-align: center;">
+      <img src="/assets/empty-datatable.png" width="200" height="200" alt="">
+    </p>
+    <p style="text-align: center;font-size: 30px;font-weight: bold;">
+      Aucune donnée à afficher !
+    </p>
+  </ng-container>
+</div>
